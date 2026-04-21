@@ -7,13 +7,15 @@
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Font Awesome -->
-    <link rel="icon" href="logo.png" type="image/png">
+  <link rel="icon" href="logo.png" type="image/png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <!-- Vue JS -->
   <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <!-- External CSS (dipisahkan) -->
+  <!-- External CSS -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body class="text-white">
@@ -26,12 +28,17 @@
       <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center overflow-hidden shadow-md shadow-blue-500/30">
         <img src="logo.png" alt="BolaPelangi Logo" class="w-8 h-8 object-contain">
       </div>
-        <span class="font-extrabold text-xl text-white">Bolapelangi</span></span>
+      <span class="font-extrabold text-xl text-white">Bolapelangi</span>
       <span class="text-xs bg-blue-500/20 px-2 py-0.5 rounded-full ml-2">Kalkulator Parlay</span>
     </div>
-    <a href="https://landing-page-5h2.pages.dev/" class="text-gray-300 hover:text-blue-400 text-sm transition">
-      <i class="fas fa-arrow-left mr-1"></i> Kembali
-    </a>
+    <div class="flex items-center gap-3">
+      <a href="#" class="px-4 py-2 rounded-lg border border-blue-500 text-blue-400 hover:bg-blue-500/10 transition-all text-sm font-semibold">
+        <i class="fas fa-sign-in-alt mr-1"></i> Login
+      </a>
+      <a href="https://landing-page-5h2.pages.dev/" class="text-gray-300 hover:text-blue-400 text-sm transition flex items-center gap-1">
+        <i class="fas fa-arrow-left mr-1"></i> Kembali
+      </a>
+    </div>
   </div>
 </nav>
 
@@ -46,7 +53,7 @@
       <h1 class="text-3xl md:text-4xl font-bold">
         Hitung <span class="text-blue-400">Kemenangan</span> Parlay Anda
       </h1>
-      <p class="text-gray-400 text-sm mt-2">Hitung otomatis odds mix parlay (Minimal 2 partai) dengan format odds desimal (contoh: 1.75)</p>
+      <p class="text-gray-400 text-sm mt-2">Hitung otomatis odds mix parlay (Minimal 2 partai, Maksimal 15 partai) dengan format odds desimal (contoh: 1.75)</p>
     </div>
 
     <div id="app" class="space-y-6">
@@ -61,9 +68,9 @@
             <div class="flex gap-2">
               <div class="flex-1">
                 <div class="text-2xl font-bold text-blue-400">{{ totalbet }}</div>
-                <p class="text-xs text-gray-500">Partai (Minimal 2)</p>
+                <p class="text-xs text-gray-500">Partai (Minimal 2, Maksimal 15)</p>
               </div>
-              <button type="button" @click="addNewParlay" :disabled="totalbet >= 20" class="px-4 py-2 bg-green-600 hover:bg-green-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-all flex items-center gap-2">
+              <button type="button" @click="addNewParlay" :disabled="totalbet >= 15" class="px-4 py-2 bg-green-600 hover:bg-green-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-all flex items-center gap-2">
                 <i class="fas fa-plus"></i> Tambah
               </button>
               <button type="button" @click="removeLastParlay" :disabled="totalbet <= 2" class="px-4 py-2 bg-red-600/80 hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-all flex items-center gap-2">
@@ -72,6 +79,9 @@
             </div>
             <p v-if="totalbet < 2" class="text-xs text-red-400 mt-1">
               <i class="fas fa-exclamation-triangle mr-1"></i> Minimal 2 partai untuk mix parlay
+            </p>
+            <p v-if="totalbet >= 15" class="text-xs text-yellow-400 mt-1">
+              <i class="fas fa-exclamation-triangle mr-1"></i> Mencapai batas maksimal 15 partai
             </p>
           </div>
           
@@ -84,7 +94,7 @@
         </div>
       </div>
 
-      <!-- Hasil Perhitungan -->
+      <!-- Hasil Perhitungan (sama seperti sebelumnya) -->
       <div class="grid md:grid-cols-2 gap-5">
         <div class="bg-gradient-to-br from-blue-600/20 to-blue-800/20 rounded-2xl p-5 border border-blue-500/30 result-card">
           <div class="flex items-center gap-3 mb-2">
@@ -124,7 +134,7 @@
         <div class="flex items-center justify-between mb-3">
           <div class="flex items-center gap-2">
             <i class="fas fa-list-ol text-blue-400"></i>
-            <h3 class="font-semibold">Daftar Partai (Minimal 2)</h3>
+            <h3 class="font-semibold">Daftar Partai</h3>
           </div>
           <span class="text-xs text-gray-500">Gunakan titik untuk desimal (contoh: 1.75)</span>
         </div>
@@ -132,18 +142,15 @@
         <div v-for="(parlay, index) in parlays" :key="index" class="parlay-card">
           <div class="bg-slate-800/40 rounded-xl p-4 border border-blue-500/20 hover:border-blue-500/40 transition">
             <div class="flex flex-wrap gap-4 items-center">
-              <!-- Nomor Partai -->
               <div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center">
                 <span class="font-bold text-blue-400">{{ index + 1 }}</span>
               </div>
               
-              <!-- Input Odds (desimal dengan titik) -->
               <div class="flex-1 min-w-[120px]">
                 <label class="block text-xs text-gray-400 mb-1">Odds Partai</label>
                 <input type="number" step="0.01" min="1.00" v-model.number="parlay.odds" @change="oddstotal" class="w-full px-3 py-2 bg-slate-900 border border-blue-500/30 rounded-lg text-white focus:outline-none focus:border-blue-400">
               </div>
               
-              <!-- Pilihan Hasil -->
               <div class="flex-1 min-w-[220px]">
                 <label class="block text-xs text-gray-400 mb-1">Hasil Partai</label>
                 <div class="flex flex-wrap gap-3 text-sm">
@@ -166,15 +173,13 @@
                 </div>
               </div>
               
-              <!-- Hasil Odds Hitung -->
               <div class="min-w-[100px]">
-                <label class="block text-xs text-gray-400 mb-1">Odss x Hitung</label>
+                <label class="block text-xs text-gray-400 mb-1">Odds x Hitung</label>
                 <div class="px-3 py-2 bg-slate-900/50 rounded-lg text-center">
                   <span class="font-mono text-blue-300">{{ formatOdds(parlay.oddsx) }}x</span>
                 </div>
               </div>
               
-              <!-- Tombol Hapus (disable jika total partai <= 2) -->
               <button type="button" @click="removeParlay(index)" :disabled="totalbet <= 2" class="px-3 py-2 bg-red-600/50 hover:bg-red-600 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg transition">
                 <i class="fas fa-trash-alt"></i>
               </button>
@@ -201,35 +206,28 @@
             <p class="font-mono text-xs bg-slate-900 p-2 rounded-lg">(Hasil Perkalian Odds x Jumlah Bet) - Jumlah Bet</p>
             <p class="text-xs text-gray-400">Jika hasil minus = kalah | Jika hasil plus = menang</p>
             <p class="text-xs text-gray-500 mt-1">⚠️ Gunakan format desimal dengan titik (contoh: 1.75, 2.10)</p>
+            <p class="text-xs text-blue-400 mt-1">✨ Maksimal 15 partai untuk mix parlay</p>
           </div>
         </div>
       </div>
       
     </div>
 
-  <!-- FLOATING SOCIAL ICONS: WhatsApp & Telegram (kanan bawah) dengan Animasi -->
-  <div class="fixed bottom-6 right-6 z-50 flex flex-col gap-4">
-    <!-- WhatsApp -->
-    <a href="https://bopel.vip/wa" target="_blank" 
-       class="whatsapp-float group w-14 h-14 bg-green-500 rounded-full flex items-center justify-center shadow-xl transition-all duration-300 hover:scale-110 hover:shadow-green-500/50" 
-       aria-label="WhatsApp">
-      <i class="fab fa-whatsapp text-white text-3xl"></i>
-      <span class="absolute right-full mr-3 px-3 py-1.5 bg-slate-800 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap shadow-lg translate-x-2 group-hover:translate-x-0">
-        <i class="fab fa-whatsapp mr-1 text-green-400"></i> Chat WhatsApp
-      </span>
-    </a>
-    
-    <!-- Telegram -->
-    <a href="https://bopel.link/telegram" target="_blank" 
-       class="telegram-float group w-14 h-14 bg-[#26A5E4] rounded-full flex items-center justify-center shadow-xl transition-all duration-300 hover:scale-110 hover:shadow-blue-400/50" 
-       aria-label="Telegram">
-      <i class="fab fa-telegram-plane text-white text-3xl"></i>
-      <span class="absolute right-full mr-3 px-3 py-1.5 bg-slate-800 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap shadow-lg translate-x-2 group-hover:translate-x-0">
-        <i class="fab fa-telegram mr-1 text-blue-400"></i> Join Telegram
-      </span>
-    </a>
-  </div>
-
+    <!-- Floating Social Icons -->
+    <div class="fixed bottom-6 right-6 z-50 flex flex-col gap-4">
+      <a href="https://bopel.vip/wa" target="_blank" class="whatsapp-float group w-14 h-14 bg-green-500 rounded-full flex items-center justify-center shadow-xl transition-all duration-300 hover:scale-110 hover:shadow-green-500/50">
+        <i class="fab fa-whatsapp text-white text-3xl"></i>
+        <span class="absolute right-full mr-3 px-3 py-1.5 bg-slate-800 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap shadow-lg translate-x-2 group-hover:translate-x-0">
+          <i class="fab fa-whatsapp mr-1 text-green-400"></i> Chat WhatsApp
+        </span>
+      </a>
+      <a href="https://bopel.link/telegram" target="_blank" class="telegram-float group w-14 h-14 bg-[#26A5E4] rounded-full flex items-center justify-center shadow-xl transition-all duration-300 hover:scale-110 hover:shadow-blue-400/50">
+        <i class="fab fa-telegram-plane text-white text-3xl"></i>
+        <span class="absolute right-full mr-3 px-3 py-1.5 bg-slate-800 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap shadow-lg translate-x-2 group-hover:translate-x-0">
+          <i class="fab fa-telegram mr-1 text-blue-400"></i> Join Telegram
+        </span>
+      </a>
+    </div>
 
     <!-- Footer -->
     <footer class="mt-12 pt-6 text-center text-gray-500 text-xs border-t border-blue-500/20">
@@ -256,7 +254,6 @@
           let total = 1;
           for (let i = 0; i < this.parlays.length; i++) {
             let oddsValue = this.hitungOdds(this.parlays[i]);
-            // Validasi odds tidak boleh NaN atau 0
             if (isNaN(oddsValue) || oddsValue === 0) oddsValue = 1;
             this.parlays[i].oddsx = parseFloat(oddsValue).toFixed(2);
             total = total * oddsValue;
@@ -277,25 +274,29 @@
           if (isNaN(odds) || odds <= 0) return 1;
           
           switch (parlay.hasil) {
-            case '1': // Menang Full
-              return odds;
-            case '0.5': // Menang Setengah
-              return (odds - 1) / 2 + 1;
-            case '-0.5': // Kalah Setengah
-              return 0.5;
-            case '0': // Seri / Void
-              return 1;
-            default:
-              return odds;
+            case '1': return odds;
+            case '0.5': return (odds - 1) / 2 + 1;
+            case '-0.5': return 0.5;
+            case '0': return 1;
+            default: return odds;
           }
         },
         oddstotal: function() {
-          // Trigger computed refresh
           this.$forceUpdate();
         },
         addNewParlay: function() {
-          if (this.totalbet >= 20) {
-            alert('Maksimal 20 partai!');
+          if (this.totalbet >= 15) {
+            Swal.fire({
+              title: '⚠️ Maksimal Partai!',
+              text: 'Maaf, maksimal partai untuk mix parlay adalah 15 tim.',
+              icon: 'warning',
+              background: '#1e293b',
+              color: '#fff',
+              confirmButtonColor: '#3b82f6',
+              confirmButtonText: 'Mengerti',
+              timer: 3000,
+              showConfirmButton: true
+            });
             return;
           }
           this.parlays.push({
@@ -308,14 +309,34 @@
           if (this.parlays.length > 2) {
             this.parlays.splice(index, 1);
           } else {
-            alert('Minimal 2 partai untuk mix parlay!');
+            Swal.fire({
+              title: 'ℹ️ Minimal Partai!',
+              text: 'Minimal 2 partai untuk mix parlay. Tidak bisa menghapus partai lagi!',
+              icon: 'info',
+              background: '#1e293b',
+              color: '#fff',
+              confirmButtonColor: '#3b82f6',
+              confirmButtonText: 'Mengerti',
+              timer: 2500,
+              showConfirmButton: true
+            });
           }
         },
         removeLastParlay: function() {
           if (this.parlays.length > 2) {
             this.parlays.pop();
           } else {
-            alert('Minimal 2 partai untuk mix parlay!');
+            Swal.fire({
+              title: 'ℹ️ Minimal Partai!',
+              text: 'Minimal 2 partai untuk mix parlay. Tidak bisa menghapus partai lagi!',
+              icon: 'info',
+              background: '#1e293b',
+              color: '#fff',
+              confirmButtonColor: '#3b82f6',
+              confirmButtonText: 'Mengerti',
+              timer: 2500,
+              showConfirmButton: true
+            });
           }
         },
         formatRupiah: function(value) {
@@ -327,11 +348,7 @@
             minimumFractionDigits: 0,
             maximumFractionDigits: 0
           }).format(Math.abs(val));
-          
-          if (val < 0) {
-            return '- ' + formatted;
-          }
-          return formatted;
+          return val < 0 ? '- ' + formatted : formatted;
         },
         formatOdds: function(value) {
           let val = parseFloat(value);
@@ -343,6 +360,31 @@
         this.oddstotal();
       }
     });
+    
+    // Proteksi konten (sama seperti sebelumnya)
+    document.addEventListener('contextmenu', function(e) {
+      e.preventDefault();
+      return false;
+    });
+    
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'F12' || 
+          (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
+          (e.ctrlKey && (e.key === 'u' || e.key === 's')) ||
+          (e.metaKey && e.altKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
+          (e.metaKey && e.key === 'u')) {
+        e.preventDefault();
+        return false;
+      }
+    });
+    
+    document.addEventListener('dragstart', function(e) { e.preventDefault(); return false; });
+    document.addEventListener('selectstart', function(e) { e.preventDefault(); return false; });
+    document.addEventListener('copy', function(e) { e.preventDefault(); return false; });
+    document.addEventListener('cut', function(e) { e.preventDefault(); return false; });
+    document.addEventListener('paste', function(e) { e.preventDefault(); return false; });
+    
+    console.log('🔒 Kalkulator Mix Parlay siap digunakan | Maksimal 15 partai');
   </script>
 </body>
 </html>
